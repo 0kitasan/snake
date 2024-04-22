@@ -30,3 +30,19 @@
 *.exe
 *.out
 *.app
+
+
+# 忽略编译生成的目录
+build/
+bin/
+
+# 忽略临时文件
+*~
+
+# 忽略IDE生成的文件和目录
+.vscode/
+.idea/
+
+# 忽略依赖管理工具生成的文件和目录
+node_modules/
+vendor/
