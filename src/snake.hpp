@@ -22,21 +22,12 @@ public:
 
     void init_game(); // 考虑直接使用构造函数而不是Init()
     void draw(SDL_Renderer* renderer);
-    /*
-  @todo 需要画出snakebody/food/背景/边界
-  */
+    //需要画出snakebody/food/背景/边界
 
-    void move_forward() {
-        snake_body.insert(snake_body.begin(),
-                          snake_body.back()); // 将最后一个元素插入到第一个位置
-        snake_body.pop_back(); // 删除最后一个元素
-    };
-
+    void move_forward();
     void gen_food();
-
     void logic();
     // 包括是否吃到食物/蛇是否越界
-
     void cmd_cvt();
 
     Snake() {

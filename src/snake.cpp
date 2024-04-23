@@ -18,3 +18,9 @@ void snake::Snake::draw(SDL_Renderer* renderer) {
 
     SDL_RenderPresent(renderer);
 }
+
+void snake::Snake::move_forward() {
+    snake_body.pop_back(); // 删除最后一个元素
+     // 在最前面插入新元素，沿着原来的方向
+    snake_body.insert(snake_body.begin(), snake_body.back());
+}
