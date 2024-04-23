@@ -19,19 +19,24 @@ public:
     int pixel_width = 5;
     int pixel_height = 5;
     int fps = 10;
+    int dx=0;
+    int dy=0;
+    int food_x=0;
+    int food_y=0;
 
     void init_game(); // 考虑直接使用构造函数而不是Init()
     void draw(SDL_Renderer* renderer);
     //需要画出snakebody/food/背景/边界
 
-    void move_forward();
+    void move_forward(int &dx,int &dy);
     void gen_food();
     void logic();
     // 包括是否吃到食物/蛇是否越界
     void cmd_cvt();
 
     Snake() {
-        snake_body.emplace_back(screen_width / 2, screen_height / 2);
+        snake_body.emplace_back(screen_width / 2, screen_height / 2) ;
+        // 这里不需要使用std::make_pair()，emplace_back似乎会自动加上
         std::cout << "Constructor called" << std::endl;
     }
 

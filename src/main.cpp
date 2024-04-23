@@ -20,8 +20,8 @@ int main() {
             }
         }
         // 绘制游戏界面
+        test_snake.gen_food();
         test_snake.draw(renderer);
-
         SDL_Delay(100);
     }
 

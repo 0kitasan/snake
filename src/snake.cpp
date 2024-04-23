@@ -1,4 +1,5 @@
 #include "snake.hpp"
+#include <utility>
 
 void snake::Snake::draw(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -13,14 +14,23 @@ void snake::Snake::draw(SDL_Renderer* renderer) {
 
     // 绘制食物
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // 红色
-    SDL_Rect rect = { 3, 3, pixel_width, pixel_height };
+    SDL_Rect rect = { food_x, food_y, pixel_width, pixel_height };
     SDL_RenderFillRect(renderer, &rect);
 
     SDL_RenderPresent(renderer);
 }
 
-void snake::Snake::move_forward() {
+void snake::Snake::move_forward(int& dx, int& dy) {
     snake_body.pop_back(); // 删除最后一个元素
-     // 在最前面插入新元素，沿着原来的方向
-    snake_body.insert(snake_body.begin(), snake_body.back());
+    // 在最前面插入新元素，沿着原来的方向前进一格
+    int snake_head_x = snake_body.begin()->first + dx;
+    int snake_head_y = snake_body.begin()->second + dy;
+    std::pair<int, int> snake_head_renew = std::make_pair(snake_head_x, snake_head_y);
+    snake_body.insert(snake_body.begin(), snake_head_renew);
+}
+
+void snake::Snake::gen_food() {
+    food_x = rand() % (screen_width / pixel_width) * pixel_width;
+    food_y = rand() % (screen_height / pixel_height) * pixel_height;
+    //这里要确保food和snake不重合
 }
