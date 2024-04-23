@@ -23,17 +23,17 @@ private:
   int fps = 10;
   int width = 50;
   int height = 20;
-  // 为了方便，直接使用stl(vector)来存储蛇身各点的位置
-  std::vector<std::pair<int, int>> snake_position;
+  // 为了方便，直接使用stl(vector)来存储蛇身位置
+  std::vector<std::pair<int, int>> snake_body;
 
 public:
   void Init(); // 考虑直接使用构造函数而不是Init()
   void Draw();
   void Move() {
-    snake_position.insert(
-        snake_position.begin(),
-        snake_position.back()); // 将最后一个元素插入到第一个位置
-    snake_position.pop_back();  // 删除最后一个元素
+    snake_body.insert(
+        snake_body.begin(),
+        snake_body.back()); // 将最后一个元素插入到第一个位置
+    snake_body.pop_back();  // 删除最后一个元素
   };
 
   void Logic();
@@ -41,7 +41,7 @@ public:
 
   void CmdCvt();
   Snake() {
-    snake_position.push_back(std::make_pair(width / 2, height / 2));
+    snake_body.push_back(std::make_pair(width / 2, height / 2));
     std::cout << "Constructor called" << std::endl;
   }
   ~Snake() { std::cout << "Destructor called" << std::endl; }
@@ -49,6 +49,7 @@ public:
 } // namespace snake
 
 #endif // SNAKE_HPP
+
 
 /*
 #include <ncurses.h>
