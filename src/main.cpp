@@ -3,26 +3,25 @@
 int main() {
     snake::Snake test_snake;
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_CreateWindowAndRenderer(test_snake.screen_width,
-                                test_snake.screen_height,
+    SDL_CreateWindowAndRenderer(screen_width,
+                                screen_height,
                                 0,
                                 &window,
                                 &renderer);
 
     bool quit = false;
+    test_snake.gen_food();
+    SDL_Event event;
     while (!quit) {
-        SDL_Event event;
+        test_snake.draw(renderer);
         while (SDL_PollEvent(&event) != 0) {
             if (event.type == SDL_QUIT) {
-                quit = true;
+                quit = true; 
             }
+            test_snake.input_cmd_cvt(event);
         }
-        // 绘制游戏界面
-        test_snake.gen_food();
-        test_snake.draw(renderer);
-        SDL_Delay(100);
+        test_snake.logic_process();
+        SDL_Delay(test_snake.fps);
     }
 
     // 退出SDL
