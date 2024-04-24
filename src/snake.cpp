@@ -62,7 +62,6 @@ void snake::Snake::logic_process() {
     bool condition2 =
         (food_y - UNIT_SIZE / 10 < snake_head_y) && (snake_head_y < food_x + UNIT_SIZE / 10);
     if (condition1 && condition2) {
-        std::cout << "food eaten!" << std::endl;
         grow_and_move(dx, dy);
         gen_food();
         score++;
