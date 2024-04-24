@@ -1,33 +1,23 @@
 #include "snake.cpp"
+#include "snake.hpp"
 
 int main() {
     snake::Snake test_snake;
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_CreateWindowAndRenderer(screen_width,
-                                screen_height,
-                                0,
-                                &window,
-                                &renderer);
+    
+    while (true) {
+        screen_img.setTo(cv::Scalar(0, 0, 0));
+        
+        test_snake.draw();
+        test_snake.debug_info();
+        // 显示图像
+        cv::imshow("Snake Game", screen_img);
 
-    bool quit = false;
-    test_snake.gen_food();
-    SDL_Event event;
-    while (!quit) {
-        test_snake.draw(renderer);
-        while (SDL_PollEvent(&event) != 0) {
-            if (event.type == SDL_QUIT) {
-                quit = true; 
-            }
-            test_snake.input_cmd_cvt(event);
-        }
         test_snake.logic_process();
-        SDL_Delay(test_snake.fps);
-    }
 
-    // 退出SDL
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+        if (!test_snake.input_cmd_cvt()) { 
+            break;
+        }
+    }
 
     return 0;
 }
