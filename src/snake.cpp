@@ -1,4 +1,5 @@
 #include "snake.hpp"
+#include <random>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -32,6 +33,19 @@ void snake::Snake::draw() {
         cv::rectangle(screen_img,
                       cv::Rect(x * UNIT_SIZE,
                                (screen_height_n - 1) * UNIT_SIZE,
+                               10 * UNIT_SIZE,
+                               10 * UNIT_SIZE),
+                      cv::Scalar(255, 255, 255),
+                      -1);
+    }
+    for (int y = 0; y < screen_width_n; y++) {
+        cv::rectangle(screen_img,
+                      cv::Rect(0, y * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE),
+                      cv::Scalar(255, 255, 255),
+                      -1);
+        cv::rectangle(screen_img,
+                      cv::Rect((screen_width_n - 1) * UNIT_SIZE,
+                               y * UNIT_SIZE,
                                10 * UNIT_SIZE,
                                10 * UNIT_SIZE),
                       cv::Scalar(255, 255, 255),
@@ -84,53 +98,41 @@ void snake::Snake::grow_and_move() {
 }
 
 void snake::Snake::gen_food() {
-    // 通过种子生成伪随机数
-    srand(time(nullptr));
-    food_x = rand() % (screen_width_n - 2);
-    food_y = rand() % (screen_height_n - 2);
-    std::pair<int, int> food_pos = std::make_pair(food_x + 1, food_y + 1);
+    //使用<random>生成随机数
+    //这种方法似乎比srand(time(nullptr))更好
+    std::random_device rd;
+    std::mt19937 gen(rd()); // 使用随机设备生成随机数种子
+    // 定义均匀分布的整数随机数生成器
+    std::uniform_int_distribution<int> dis_x(1, screen_width_n - 2);
+    std::uniform_int_distribution<int> dis_y(1, screen_height_n - 2);
+    food_x = dis_x(gen);
+    food_y = dis_y(gen);
+    std::pair<int, int> food_pos = std::make_pair(food_x, food_y);
+
     //这里要确保food和snake不重合
-    // for (auto body: snake_body) {
-    //     if (body == food_pos) {
-    //         gen_food();
-    //     }
-    // }
+    for (auto body: snake_body) {
+        if (body == food_pos) {
+            // 个人觉得这个方法不是很好，因此将重合次数存储并输出
+            food_overlap_time++;
+            gen_food();
+        }
+    }
+}
+void snake::Snake::gameover_logic() {
+    int snake_head_x = snake_body.begin()->first;
+    int snake_head_y = snake_body.begin()->second;
+    bool condition1 = (snake_head_x == 0) || (snake_head_x == screen_width_n - 1);
+    bool condition2 = (snake_head_y == 0) || (snake_head_y == screen_height_n - 1);
+    if (condition1 || condition2) {
+        game_over = true;
+        std::cout << "Game Over~" << std::endl;
+    }
 }
 
 void snake::Snake::logic_process() {
-    //检测是否吃到食物
-    int snake_head_x = snake_body.begin()->first;
-    int snake_head_y = snake_body.begin()->second;
-    bool condition1 = (food_x == snake_head_x);
-    bool condition2 = (food_y == snake_head_y);
-
-    if (condition1 && condition2) {
-        grow_and_move();
-        gen_food();
-        score++;
-    } else {
-        move_forward();
-    }
-}
-
-bool snake::Snake::input_cmd_cvt() {
-    bool result = true;
-    int key = cv::waitKey(DELAY); // 等待键盘输入
-    if (key == 'q' || key == 27) {
-        // 按下q或esc，则退出循环
-        // @todo：还需要完善
-        // 通过cv的关闭键来关闭页面
-        result = false;
-    } else if (key == 'w' || key == 'W') {
-        input_dir = Direction::UP;
-    } else if (key == 's' || key == 'S') {
-        input_dir = Direction::DOWN;
-    } else if (key == 'a' || key == 'A') {
-        input_dir = Direction::LEFT;
-    } else if (key == 'd' || key == 'D') {
-        input_dir = Direction::RIGHT;
-    }
+    // 检测用户输入是否会导致冲突
     if (score < 1) {
+        // 没有分数时，无需考虑冲突
         move_dir = input_dir;
         direction_cvt();
     } else {
@@ -140,13 +142,45 @@ bool snake::Snake::input_cmd_cvt() {
         bool condition3 = (move_dir == Direction::LEFT) && (input_dir == Direction::RIGHT);
         bool condition4 = (move_dir == Direction::RIGHT) && (input_dir == Direction::LEFT);
         if (condition1 || condition2 || condition3 || condition4) {
-            return result;
+            return;
         } else {
             move_dir = input_dir;
             direction_cvt();
         }
     }
-    return result;
+
+    //检测是否吃到食物
+    int snake_head_x = snake_body.begin()->first;
+    int snake_head_y = snake_body.begin()->second;
+    bool condition5 = (food_x == snake_head_x);
+    bool condition6 = (food_y == snake_head_y);
+    if (condition5 && condition6) {
+        grow_and_move();
+        gen_food();
+        score++;
+    } else {
+        move_forward();
+    }
+}
+
+void snake::Snake::input_cmd_cvt() {
+    int key = cv::waitKey(DELAY); // 等待键盘输入
+    if (key == 'q' || key == 27) {
+        // 按下q或esc，则退出循环
+        // @todo：还需要完善
+        // 通过cv的关闭键来关闭页面
+        game_quit = true;
+        std::cout << "quit game, goodbye ..." << std::endl;
+    } else if (key == 'w' || key == 'W') {
+        input_dir = Direction::UP;
+    } else if (key == 's' || key == 'S') {
+        input_dir = Direction::DOWN;
+    } else if (key == 'a' || key == 'A') {
+        input_dir = Direction::LEFT;
+    } else if (key == 'd' || key == 'D') {
+        input_dir = Direction::RIGHT;
+    }
+    frame++;
 }
 
 void snake::Snake::debug_info() {
@@ -160,15 +194,11 @@ void snake::Snake::debug_info() {
 
     std::stringstream direction_ss;
     // 对于Direction枚举类型，重载了输出运算符
-    direction_ss << "snake direction= " << move_dir;
+    direction_ss << "move/input direction= " << move_dir << "/" << input_dir;
     std::string direction = direction_ss.str();
 
-    std::stringstream direction_buf_ss;
-    // direction_buf_ss << "snake direction buffer= " << dir_cache.front();
-    direction_buf_ss << "input direction= " << input_dir;
-    std::string direction_buf = direction_buf_ss.str();
-
-    std::string score_text = "score= " + std::to_string(score);
+    std::string score_text = "score= " + std::to_string(score) + " frame=" + std::to_string(frame);
+    std::string food_overlap = "food overlap time= " + std::to_string(food_overlap_time);
 
     cv::putText(screen_img,
                 snake_pos,
@@ -199,7 +229,7 @@ void snake::Snake::debug_info() {
                 cv::Scalar(255, 0, 0),
                 2);
     cv::putText(screen_img,
-                direction_buf,
+                food_overlap,
                 cv::Point(10, 150),
                 cv::FONT_HERSHEY_SIMPLEX,
                 1.0,

@@ -4,17 +4,16 @@
 #include <thread>
 
 int main() {
-    snake::Snake test_snake;
+    snake::Snake snake_game;
 
-    while (true) {
+    while (!game_over && !game_quit) {
         screen_img.setTo(cv::Scalar(100, 100, 100));
-        if (!test_snake.input_cmd_cvt()) {
-            break;
-        }
-        test_snake.logic_process();
+        snake_game.input_cmd_cvt();
+        snake_game.gameover_logic(); // 写成一个单独的函数是为了调试方便
+        snake_game.logic_process();
         // 理应先进性逻辑处理，再画出图像
-        test_snake.draw();
-        test_snake.debug_info();
+        snake_game.draw();
+        snake_game.debug_info();
 
         // 显示图像
         cv::imshow("Snake Game", screen_img);

@@ -11,10 +11,13 @@
 // 全局变量
 int score = 0;
 int frame = 0;
-int pressed_time = 0;
+int food_overlap_time = 0;
+bool game_quit = false; // 按下退出键
+bool game_over = false; // 游戏失败
 const int UNIT_SIZE = 20;
 int screen_width_n = 40;
 int screen_height_n = 25;
+// 包括边界后，屏幕的UNIT是[0,39]*[0,24]
 int screen_width = UNIT_SIZE * screen_width_n;
 int screen_height = UNIT_SIZE * screen_height_n;
 const int FPS = 5;
@@ -51,6 +54,8 @@ private:
     std::vector<std::pair<int, int>> snake_body;
     int dx = 0;
     int dy = 0;
+    int food_x = 0;
+    int food_y = 0;
     Direction input_dir = Direction::NONE;
     Direction move_dir = Direction::NONE;
     void gen_food();
@@ -59,20 +64,15 @@ private:
     void grow_and_move();
 
 public:
-    int direction[2];
-    int direction_buf[2];
-    int food_x = 0;
-    int food_y = 0;
-    int score = 0;
-
-    void init_game(); // 考虑直接使用构造函数而不是Init()
+    // 需要画出snakebody/food/背景/边界
     void draw();
-    //需要画出snakebody/food/背景/边界
-
+    // 判断蛇是否越界/装到自身
+    void gameover_logic();
+    // 判断是否吃到食物/存在按键冲突
     void logic_process();
-    // 包括是否吃到食物/蛇是否越界
-    bool input_cmd_cvt();
-
+    // 检测用户输入
+    void input_cmd_cvt();
+    // 输出调试信息
     void debug_info();
 
     Snake() {
