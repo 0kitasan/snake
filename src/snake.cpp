@@ -1,8 +1,8 @@
 #include "snake.hpp"
+#include <opencv2/highgui.hpp>
 #include <random>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <utility>
 
 void snake::Snake::draw() {
@@ -125,6 +125,15 @@ void snake::Snake::gameover_logic() {
     bool condition2 = (snake_head_y == 0) || (snake_head_y == screen_height_n - 1);
     if (condition1 || condition2) {
         game_over = true;
+    }
+    for (auto it = snake_body.begin() + 1; it != snake_body.end(); ++it) {
+        // 检测蛇是否与自身相撞
+        auto body = *it;
+        if (snake_head_x == body.first && snake_head_y == body.second) {
+            game_over = true;
+        }
+    }
+    if (game_over) {
         std::cout << "Game Over~" << std::endl;
     }
 }
@@ -164,20 +173,22 @@ void snake::Snake::logic_process() {
 }
 
 void snake::Snake::input_cmd_cvt() {
-    int key = cv::waitKey(DELAY); // 等待键盘输入
-    if (key == 'q' || key == 27) {
+    int key = cv::waitKeyEx(DELAY); // 等待键盘输入
+    if (key == 'q' || key == 27 || key==255) {
         // 按下q或esc，则退出循环
         // @todo：还需要完善
         // 通过cv的关闭键来关闭页面
+        // 现在看来好像是不太行的，因为按下关闭键/不按任何键
+        // cv::waitKey都会返回-1
         game_quit = true;
         std::cout << "quit game, goodbye ..." << std::endl;
-    } else if (key == 'w' || key == 'W') {
+    } else if (key == 'w' || key == 'W' || key == 65362) {
         input_dir = Direction::UP;
-    } else if (key == 's' || key == 'S') {
+    } else if (key == 's' || key == 'S' || key == 65364) {
         input_dir = Direction::DOWN;
-    } else if (key == 'a' || key == 'A') {
+    } else if (key == 'a' || key == 'A' || key == 65361) {
         input_dir = Direction::LEFT;
-    } else if (key == 'd' || key == 'D') {
+    } else if (key == 'd' || key == 'D' || key == 65363) {
         input_dir = Direction::RIGHT;
     }
     frame++;
@@ -200,39 +211,40 @@ void snake::Snake::debug_info() {
     std::string score_text = "score= " + std::to_string(score) + " frame=" + std::to_string(frame);
     std::string food_overlap = "food overlap time= " + std::to_string(food_overlap_time);
 
+    double font_scale = 0.8;
     cv::putText(screen_img,
                 snake_pos,
-                cv::Point(10, 30),
+                cv::Point(20, 40),
                 cv::FONT_HERSHEY_SIMPLEX,
-                1.0,
+                font_scale,
                 cv::Scalar(255, 0, 0),
                 2);
     cv::putText(screen_img,
                 food_pos,
-                cv::Point(10, 60),
+                cv::Point(20, 65),
                 cv::FONT_HERSHEY_SIMPLEX,
-                1.0,
+                font_scale,
                 cv::Scalar(255, 0, 0),
                 2);
     cv::putText(screen_img,
                 direction,
-                cv::Point(10, 90),
+                cv::Point(20, 90),
                 cv::FONT_HERSHEY_SIMPLEX,
-                1.0,
+                font_scale,
                 cv::Scalar(255, 0, 0),
                 2);
     cv::putText(screen_img,
                 score_text,
-                cv::Point(10, 120),
+                cv::Point(20, 115),
                 cv::FONT_HERSHEY_SIMPLEX,
-                1.0,
+                font_scale,
                 cv::Scalar(255, 0, 0),
                 2);
     cv::putText(screen_img,
                 food_overlap,
-                cv::Point(10, 150),
+                cv::Point(20, 140),
                 cv::FONT_HERSHEY_SIMPLEX,
-                1.0,
+                font_scale,
                 cv::Scalar(255, 0, 0),
                 2);
 }
