@@ -11,8 +11,9 @@ int main() {
         if (!test_snake.input_cmd_cvt()) {
             break;
         }
-        test_snake.draw();
         test_snake.logic_process();
+        // 理应先进性逻辑处理，再画出图像
+        test_snake.draw();
         test_snake.debug_info();
 
         // 显示图像

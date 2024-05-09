@@ -10,6 +10,8 @@
 
 // 全局变量
 int score = 0;
+int frame = 0;
+int pressed_time = 0;
 const int UNIT_SIZE = 20;
 int screen_width_n = 40;
 int screen_height_n = 25;
@@ -17,22 +19,48 @@ int screen_width = UNIT_SIZE * screen_width_n;
 int screen_height = UNIT_SIZE * screen_height_n;
 const int FPS = 5;
 const int DELAY = 1000 / FPS; // 单位是ms
+// @todo:可以定义color结构体，设为全局变量以调控颜色
 cv::Mat screen_img(screen_height, screen_width, CV_8UC3, cv::Scalar(0, 0, 0));
-
+enum class Direction { NONE, UP, DOWN, LEFT, RIGHT };
+// 对于Direction枚举类型，重载输出运算符
+std::ostream& operator<<(std::ostream& os, const Direction& dir) {
+    switch (dir) {
+        case Direction::NONE:
+            os << "NONE";
+            break;
+        case Direction::UP:
+            os << "UP";
+            break;
+        case Direction::DOWN:
+            os << "DOWN";
+            break;
+        case Direction::LEFT:
+            os << "LEFT";
+            break;
+        case Direction::RIGHT:
+            os << "RIGHT";
+            break;
+    }
+    return os;
+}
 namespace snake {
 
 class Snake {
 private:
     // 为了方便，直接使用stl(vector)来存储蛇身位置
     std::vector<std::pair<int, int>> snake_body;
-    int dir_buf[4] = { 0 };
-    void gen_food();
-    void move_forward(int& dx, int& dy);
-    void grow_and_move(int& dx, int& dy);
-
-public:
     int dx = 0;
     int dy = 0;
+    Direction input_dir = Direction::NONE;
+    Direction move_dir = Direction::NONE;
+    void gen_food();
+    void direction_cvt();
+    void move_forward();
+    void grow_and_move();
+
+public:
+    int direction[2];
+    int direction_buf[2];
     int food_x = 0;
     int food_y = 0;
     int score = 0;
