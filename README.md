@@ -33,8 +33,37 @@ void MoveToFirst();
 
 由于SDL太恶心，将项目迁移至了opencv
 
-但是opencv有个问题，就是waitkey函数似乎会导致线程阻塞，目前并没有很好的办法解决。
+但是opencv有个问题，就是`cv::waitKey`函数的参数是最大延迟时间，而不是监听时间，
+并且它和`std::this_thread::sleep_for`好像并不兼容。因此目前并没有很好的办法解决，
+各位就当作这个游戏可以调速吧（笑）。
 
 然后终于完成了检测输入是否冲突的功能，之前一直有bug
 
-写了个脚本来检测`cv::waitKey`对于上下左右键的返回值；现在已支持使用上下左右，而不仅仅是wasd
+写了个程序来检测`cv::waitKey`对于上下左右键的返回值，因此现在已支持使用上下左右，而不仅仅是wasd
+screen_img.setTo(cv::Scalar(100, 100, 100));
+        snake_game.input_cmd_cvt();
+        snake_game.gameover_logic(); // 写成一个单独的函数是为了调试方便
+        snake_game.logic_process();
+        // 理应先进行逻辑处理，再画出图像
+        snake_game.draw();
+        snake_game.debug_info();
+
+``` mermaid
+graph TD;
+    Start --> InitializeGame[（隐式地）加载参数<br>fps,width,height,unit_size];
+    InitializeGame --> MainLoop[主循环];
+    InputCommand[input_cmd_cvt<br>cv::waitKey];
+    CheckGameOver[gameover_logic<br>撞倒自身或边界];
+    ProcessLogic[logic_process
+                  检测输入冲突
+                  吃到食物:grow_and_move
+                  没吃到:move_forward];
+    DrawGame[draw];
+    MainLoop --> InputCommand
+    InputCommand -->|direction_cvt| CheckGameOver;
+    CheckGameOver -->|游戏未失败| ProcessLogic;
+    ProcessLogic --> DrawGame;
+    CheckGameOver -->|游戏失败| QuitGame;
+    DrawGame -->|进入下次循环| MainLoop;
+```
+
