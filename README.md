@@ -60,3 +60,20 @@ graph TD;
     DrawGame -->|进入下次循环| MainLoop;
 ```
 
+**5/11更新**
+
+在尝试移植程序的过程中，发现win平台上一直报错。感谢Visual Studio强大的debug能力让我找到了原因：
+``` cpp
+void snake::Snake::move_forward() {
+    snake_body.pop_back(); // 删除最后一个元素
+    // 在最前面插入新元素，沿着原来的方向前进一格
+    int snake_head_new_x = snake_body.begin()->first + dx;
+    int snake_head_new_y = snake_body.begin()->second + dy;
+    std::pair<int, int> snake_head_new = std::make_pair(snake_head_new_x, snake_head_new_y);
+    snake_body.insert(snake_body.begin(), snake_head_new);
+}
+```
+在linux中，对于只有一个元素的容器进行`pop_back()`并不会删除其中的元素，而win上会直接删除，导致产生了空的容器，因此报错。
+
+解决方法也很简单，只要最后再进行删除操作即可。
+

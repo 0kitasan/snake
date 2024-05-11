@@ -81,12 +81,12 @@ void snake::Snake::direction_cvt() {
 }
 
 void snake::Snake::move_forward() {
-    snake_body.pop_back(); // 删除最后一个元素
     // 在最前面插入新元素，沿着原来的方向前进一格
     int snake_head_new_x = snake_body.begin()->first + dx;
     int snake_head_new_y = snake_body.begin()->second + dy;
     std::pair<int, int> snake_head_new = std::make_pair(snake_head_new_x, snake_head_new_y);
     snake_body.insert(snake_body.begin(), snake_head_new);
+    snake_body.pop_back(); // 删除最后一个元素，这一步需要最后做，防止出现未定义行为
 }
 
 void snake::Snake::grow_and_move() {
