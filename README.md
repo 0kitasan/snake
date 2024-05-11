@@ -11,6 +11,8 @@ SJTU程序设计（C++）课程大作业-陈谐老师班级。
   * 检测输入是否冲突/是否吃到食物/是否越界
   * 蛇沿着原先的方向移动
 
+可以看最后的`mermaid`思维到图。
+
 出于跨平台的考虑，目前项目采用SDL库。
 
 为了方便，项目使用stl(vector)来存储蛇身位置
@@ -40,13 +42,6 @@ void MoveToFirst();
 然后终于完成了检测输入是否冲突的功能，之前一直有bug
 
 写了个程序来检测`cv::waitKey`对于上下左右键的返回值，因此现在已支持使用上下左右，而不仅仅是wasd
-screen_img.setTo(cv::Scalar(100, 100, 100));
-        snake_game.input_cmd_cvt();
-        snake_game.gameover_logic(); // 写成一个单独的函数是为了调试方便
-        snake_game.logic_process();
-        // 理应先进行逻辑处理，再画出图像
-        snake_game.draw();
-        snake_game.debug_info();
 
 ``` mermaid
 graph TD;
