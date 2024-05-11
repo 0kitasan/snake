@@ -25,13 +25,11 @@ struct Node {
   int y;
   Node *next;
 };
-void AddEnd();
-void MoveToFirst();
 // 可以用链表存储蛇
-// 如果要更新蛇的位置，只需要把尾部元素挪到第一个即可
+// 如果要更新蛇的位置，只需要把尾部Node挪到第一个即可
 ```
 
-5/9更新
+**5/9更新**
 
 由于SDL太恶心，将项目迁移至了opencv
 
@@ -56,9 +54,9 @@ graph TD;
     DrawGame[draw];
     MainLoop --> InputCommand
     InputCommand -->|direction_cvt| CheckGameOver;
-    CheckGameOver -->|游戏未失败| ProcessLogic;
+    CheckGameOver -->|游戏正常运行| ProcessLogic;
     ProcessLogic --> DrawGame;
-    CheckGameOver -->|游戏失败| QuitGame;
+    CheckGameOver -->|游戏失败，跳出循环| QuitGame;
     DrawGame -->|进入下次循环| MainLoop;
 ```
 
